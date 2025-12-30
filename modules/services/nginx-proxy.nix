@@ -38,7 +38,7 @@ in
 
       virtualHosts = {
         # Jellyfin
-        "jellyfin.${cfg.baseDomain}" = mkIf homelabCfg.jellyfin.enable {
+        "jellyfin.${cfg.baseDomain}" = mkIf (homelabCfg ? jellyfin && homelabCfg.jellyfin.enable) {
           forceSSL = cfg.enableSSL;
           enableACME = cfg.enableSSL;
           locations."/" = {
@@ -48,7 +48,7 @@ in
         };
 
         # Sonarr
-        "sonarr.${cfg.baseDomain}" = mkIf (homelabCfg.arr.enable && homelabCfg.arr.sonarr.enable) {
+        "sonarr.${cfg.baseDomain}" = mkIf (homelabCfg ? arr && homelabCfg.arr.enable && homelabCfg.arr.sonarr.enable) {
           forceSSL = cfg.enableSSL;
           enableACME = cfg.enableSSL;
           locations."/" = {
@@ -57,7 +57,7 @@ in
         };
 
         # Radarr
-        "radarr.${cfg.baseDomain}" = mkIf (homelabCfg.arr.enable && homelabCfg.arr.radarr.enable) {
+        "radarr.${cfg.baseDomain}" = mkIf (homelabCfg ? arr && homelabCfg.arr.enable && homelabCfg.arr.radarr.enable) {
           forceSSL = cfg.enableSSL;
           enableACME = cfg.enableSSL;
           locations."/" = {
@@ -66,7 +66,7 @@ in
         };
 
         # Prowlarr
-        "prowlarr.${cfg.baseDomain}" = mkIf (homelabCfg.arr.enable && homelabCfg.arr.prowlarr.enable) {
+        "prowlarr.${cfg.baseDomain}" = mkIf (homelabCfg ? arr && homelabCfg.arr.enable && homelabCfg.arr.prowlarr.enable) {
           forceSSL = cfg.enableSSL;
           enableACME = cfg.enableSSL;
           locations."/" = {
@@ -75,11 +75,11 @@ in
         };
 
         # qBittorrent
-        "qbittorrent.${cfg.baseDomain}" = mkIf homelabCfg.qbittorrent.enable {
+        "qbittorrent.${cfg.baseDomain}" = mkIf (homelabCfg ? qbittorrent && homelabCfg.qbittorrent.enable) {
           forceSSL = cfg.enableSSL;
           enableACME = cfg.enableSSL;
           locations."/" = {
-            proxyPass = "http://127.0.0.1:${toString homelabCfg.qbittorrent.port}";
+            proxyPass = "http://127.0.0.1:${toString (homelabCfg.qbittorrent.port or 8080)}";
           };
         };
       };

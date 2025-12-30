@@ -50,7 +50,15 @@
         '';
       };
 
-      # NixOS VM tests (require linux builder on macOS)
+      # NixOS VM tests (aarch64-linux to match Apple Silicon + linux-builder)
+      checks.aarch64-linux = let
+        pkgs = nixpkgs.legacyPackages.aarch64-linux;
+        tests = import ./tests { inherit pkgs; };
+      in {
+        inherit (tests) jellyfin sonarr radarr prowlarr qbittorrent nginx media-stack;
+      };
+
+      # NixOS VM tests (x86_64-linux for GitHub Actions CI)
       checks.x86_64-linux = let
         pkgs = nixpkgs.legacyPackages.x86_64-linux;
         tests = import ./tests { inherit pkgs; };

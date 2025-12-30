@@ -11,7 +11,8 @@ pkgs.testers.runNixOSTest {
     ];
 
     virtualisation = {
-      memorySize = 2048;
+      memorySize = 4096;
+      diskSize = 3 * 1024;  # 3GB - Jellyfin needs 512MB+ free in /var/log
       cores = 2;
     };
 
@@ -34,21 +35,21 @@ pkgs.testers.runNixOSTest {
   testScript = ''
     machine.start()
 
-    # Wait for backend service
+    # Wait for backend service (Jellyfin can be slow to start)
     machine.wait_for_unit("jellyfin.service")
-    machine.wait_for_open_port(8096)
+    machine.wait_for_open_port(8096, timeout=120)
 
     # Wait for nginx
     machine.wait_for_unit("nginx.service")
     machine.wait_for_open_port(80)
 
-    # Test direct backend access
-    machine.succeed("curl -sf http://localhost:8096")
+    # Test direct backend access (with retries)
+    machine.wait_until_succeeds("curl -sf http://localhost:8096", timeout=60)
 
     # Test nginx proxy with Host header
     machine.succeed("curl -sf -H 'Host: jellyfin.test.local' http://localhost")
 
-    # Verify nginx config was generated
-    machine.succeed("test -f /etc/nginx/nginx.conf")
+    # Verify nginx service is healthy
+    machine.succeed("systemctl status nginx")
   '';
 }
