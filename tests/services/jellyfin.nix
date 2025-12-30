@@ -9,6 +9,7 @@ pkgs.testers.runNixOSTest {
 
     virtualisation = {
       memorySize = 4096;
+      diskSize = 3 * 1024;  # 3GB - Jellyfin needs 512MB+ free in /var/log
       cores = 2;
     };
 
