@@ -6,6 +6,7 @@
     ./disko.nix
     inputs.disko.nixosModules.disko
     ../../modules/infrastructure/sops.nix
+    ../../modules/services/comin.nix
   ];
 
   networking.hostName = "roubaix";
