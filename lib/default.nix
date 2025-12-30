@@ -1,9 +1,9 @@
-{ nixpkgs, self, ... }:
+{ nixpkgs, self, inputs, ... }:
 {
   # Create a NixOS VM configuration (for local testing)
   mkVM = { name, system ? "aarch64-linux" }: nixpkgs.lib.nixosSystem {
     inherit system;
-    specialArgs = { inherit self; };
+    specialArgs = { inherit self inputs; };
     modules = [
       ../modules/common
       ../modules/profiles/qemu-vm.nix
@@ -14,7 +14,7 @@
   # Create a real host configuration
   mkHost = { name, system ? "x86_64-linux" }: nixpkgs.lib.nixosSystem {
     inherit system;
-    specialArgs = { inherit self; };
+    specialArgs = { inherit self inputs; };
     modules = [
       ../modules/common
       ../hosts/${name}

@@ -3,12 +3,17 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+
+    sops-nix = {
+      url = "github:Mic92/sops-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, ... }@inputs:
+  outputs = { self, nixpkgs, sops-nix, ... }@inputs:
     let
       # Import helper functions
-      lib = import ./lib { inherit nixpkgs self; };
+      lib = import ./lib { inherit nixpkgs self inputs; };
 
       # Darwin system for devShell
       darwinPkgs = nixpkgs.legacyPackages.aarch64-darwin;
@@ -27,6 +32,8 @@
       devShells.aarch64-darwin.default = darwinPkgs.mkShell {
         packages = with darwinPkgs; [
           qemu
+          sops
+          age
         ];
         shellHook = ''
           echo "NixOS Homelab - run ./scripts/run-vm <config> build"
