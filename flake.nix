@@ -55,7 +55,7 @@
         pkgs = nixpkgs.legacyPackages.aarch64-linux;
         tests = import ./tests { inherit pkgs; };
       in {
-        inherit (tests) jellyfin sonarr radarr prowlarr qbittorrent nginx media-stack;
+        inherit (tests) jellyfin sonarr radarr prowlarr qbittorrent bazarr nginx media-stack;
       };
 
       # NixOS VM tests (x86_64-linux for GitHub Actions CI)
@@ -63,7 +63,7 @@
         pkgs = nixpkgs.legacyPackages.x86_64-linux;
         tests = import ./tests { inherit pkgs; };
       in {
-        inherit (tests) jellyfin sonarr radarr prowlarr qbittorrent nginx media-stack;
+        inherit (tests) jellyfin sonarr radarr prowlarr qbittorrent bazarr nginx media-stack;
       };
     };
 }

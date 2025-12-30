@@ -34,6 +34,7 @@ pkgs.testers.runNixOSTest {
         machine.wait_for_unit("radarr.service")
         machine.wait_for_unit("prowlarr.service")
         machine.wait_for_unit("qbittorrent.service")
+        machine.wait_for_unit("bazarr.service")
         machine.wait_for_unit("nginx.service")
 
     # Verify all ports are open
@@ -43,6 +44,7 @@ pkgs.testers.runNixOSTest {
         machine.wait_for_open_port(7878)   # Radarr
         machine.wait_for_open_port(9696)   # Prowlarr
         machine.wait_for_open_port(8080)   # qBittorrent
+        machine.wait_for_open_port(6767)   # Bazarr
         machine.wait_for_open_port(80)     # Nginx
 
     # Test direct service access
@@ -51,6 +53,7 @@ pkgs.testers.runNixOSTest {
         machine.succeed("curl -sf http://localhost:8989")  # Sonarr
         machine.succeed("curl -sf http://localhost:7878")  # Radarr
         machine.succeed("curl -sf http://localhost:9696")  # Prowlarr
+        machine.succeed("curl -sf http://localhost:6767")  # Bazarr
 
     # Test nginx reverse proxy
     with subtest("Nginx reverse proxy"):
@@ -58,6 +61,7 @@ pkgs.testers.runNixOSTest {
         machine.succeed("curl -sf -H 'Host: sonarr.test.local' http://localhost")
         machine.succeed("curl -sf -H 'Host: radarr.test.local' http://localhost")
         machine.succeed("curl -sf -H 'Host: prowlarr.test.local' http://localhost")
+        machine.succeed("curl -sf -H 'Host: bazarr.test.local' http://localhost")
 
     # Verify directory structure
     with subtest("Directory structure"):

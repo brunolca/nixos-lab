@@ -82,6 +82,15 @@ in
             proxyPass = "http://127.0.0.1:${toString (homelabCfg.qbittorrent.port or 8080)}";
           };
         };
+
+        # Bazarr
+        "bazarr.${cfg.baseDomain}" = mkIf (homelabCfg ? bazarr && homelabCfg.bazarr.enable) {
+          forceSSL = cfg.enableSSL;
+          enableACME = cfg.enableSSL;
+          locations."/" = {
+            proxyPass = "http://127.0.0.1:${toString (homelabCfg.bazarr.port or 6767)}";
+          };
+        };
       };
     };
 

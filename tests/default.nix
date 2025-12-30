@@ -11,6 +11,7 @@ in
   radarr = import ./services/radarr.nix { inherit pkgs lib; };
   prowlarr = import ./services/prowlarr.nix { inherit pkgs lib; };
   qbittorrent = import ./services/qbittorrent.nix { inherit pkgs lib; };
+  bazarr = import ./services/bazarr.nix { inherit pkgs lib; };
 
   # Nginx reverse proxy test
   nginx = import ./nginx.nix { inherit pkgs lib; };
