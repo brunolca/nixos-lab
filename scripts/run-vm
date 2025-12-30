@@ -1,0 +1,100 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
+IMAGE_DIR="$PROJECT_DIR/images"
+
+VM_NAME="${1:-minimal}"
+MODE="${2:-gui}"  # gui, headless, or build
+
+# VM resources (adjust as needed)
+MEMORY="4G"
+CPUS="4"
+SSH_PORT="2222"
+
+# Use more memory for desktop
+if [[ "$VM_NAME" == "desktop" ]]; then
+  MEMORY="8G"
+fi
+
+show_help() {
+  echo "Usage: run-vm <config> [mode]"
+  echo ""
+  echo "Configs: minimal, server, desktop"
+  echo "Modes:"
+  echo "  gui      - Run with graphical display (default)"
+  echo "  headless - Run headless, SSH on port $SSH_PORT"
+  echo "  build    - Build and run NixOS's built-in VM (recommended for testing)"
+  echo ""
+  echo "Examples:"
+  echo "  ./scripts/run-vm minimal"
+  echo "  ./scripts/run-vm server headless"
+  echo "  ./scripts/run-vm desktop build"
+}
+
+if [[ "$VM_NAME" == "-h" || "$VM_NAME" == "--help" ]]; then
+  show_help
+  exit 0
+fi
+
+cd "$PROJECT_DIR"
+
+# Build mode: use NixOS's built-in VM builder (easiest for testing configs)
+if [[ "$MODE" == "build" ]]; then
+  echo "==> Building NixOS VM for: $VM_NAME"
+  nix build ".#nixosConfigurations.${VM_NAME}.config.system.build.vm" --out-link "result-${VM_NAME}-vm"
+
+  echo "==> Starting VM..."
+  echo "Login: bruno / nixos"
+  echo "To quit: Ctrl+A, X (in serial console) or close window"
+  echo ""
+
+  # Run the VM
+  "./result-${VM_NAME}-vm/bin/run-nixos-${VM_NAME}-vm"
+  exit 0
+fi
+
+# Manual QEMU mode (for custom disk images)
+IMAGE_PATH="$IMAGE_DIR/${VM_NAME}.qcow2"
+
+if [[ ! -f "$IMAGE_PATH" ]]; then
+  echo "Error: Disk image not found at $IMAGE_PATH"
+  echo "Run: ./scripts/build-image $VM_NAME"
+  echo ""
+  echo "Or use 'build' mode for quick testing:"
+  echo "  ./scripts/run-vm $VM_NAME build"
+  exit 1
+fi
+
+QEMU_ARGS=(
+  -machine virt,accel=hvf
+  -cpu host
+  -m "$MEMORY"
+  -smp "$CPUS"
+  -drive "file=$IMAGE_PATH,format=qcow2,if=virtio"
+  -netdev "user,id=net0,hostfwd=tcp::${SSH_PORT}-:22"
+  -device virtio-net,netdev=net0
+  -device virtio-rng-pci
+)
+
+case "$MODE" in
+  gui)
+    echo "==> Starting $VM_NAME VM (GUI mode)"
+    echo "SSH available on: ssh -p $SSH_PORT bruno@localhost"
+    QEMU_ARGS+=(-device virtio-gpu -display cocoa)
+    ;;
+  headless)
+    echo "==> Starting $VM_NAME VM (headless mode)"
+    echo "SSH: ssh -p $SSH_PORT bruno@localhost"
+    echo "Serial console active. Ctrl+A, X to quit."
+    QEMU_ARGS+=(-nographic)
+    ;;
+  *)
+    echo "Unknown mode: $MODE"
+    show_help
+    exit 1
+    ;;
+esac
+
+qemu-system-aarch64 "${QEMU_ARGS[@]}"

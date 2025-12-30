@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
+IMAGE_DIR="$PROJECT_DIR/images"
+
+VM_NAME="${1:-minimal}"
+DISK_SIZE="${2:-20G}"
+
+echo "==> Building NixOS configuration: $VM_NAME"
+
+cd "$PROJECT_DIR"
+
+# Build the NixOS system
+nix build ".#nixosConfigurations.${VM_NAME}.config.system.build.toplevel" --out-link "result-${VM_NAME}"
+
+echo "==> Creating disk image ($DISK_SIZE)..."
+mkdir -p "$IMAGE_DIR"
+
+IMAGE_PATH="$IMAGE_DIR/${VM_NAME}.qcow2"
+
+# Create a fresh disk image
+qemu-img create -f qcow2 "$IMAGE_PATH" "$DISK_SIZE"
+
+echo "==> Installing NixOS to image..."
+echo "NOTE: First boot will take a while as it sets up the system."
+echo ""
+echo "Image created at: $IMAGE_PATH"
+echo ""
+echo "To install NixOS, you need to:"
+echo "1. Boot the NixOS installer ISO"
+echo "2. Run the install process"
+echo ""
+echo "Or use nixos-anywhere for automated installation."
+echo ""
+echo "For quick testing, use: nix build .#nixosConfigurations.${VM_NAME}.config.system.build.vm"
+echo "This creates a self-contained VM script in ./result/bin/run-*-vm"
