@@ -7,6 +7,9 @@
 
   outputs = { self, nixpkgs }:
     let
+      # macOS system for devShell
+      darwinPkgs = nixpkgs.legacyPackages.aarch64-darwin;
+
       # Helper to create a NixOS config for QEMU/aarch64
       mkVM = name: nixpkgs.lib.nixosSystem {
         system = "aarch64-linux";
@@ -38,6 +41,15 @@
         minimal = mkVM "minimal";
         server = mkVM "server";
         desktop = mkVM "desktop";
+      };
+
+      devShells.aarch64-darwin.default = darwinPkgs.mkShell {
+        packages = with darwinPkgs; [
+          qemu
+        ];
+        shellHook = ''
+          echo "NixOS VM Lab - run ./scripts/run-vm <config> build"
+        '';
       };
     };
 }
