@@ -5,6 +5,7 @@
     inherit system;
     specialArgs = { inherit self inputs; };
     modules = [
+      inputs.sops-nix.nixosModules.sops
       ../modules/common
       ../modules/profiles/qemu-vm.nix
       ../hosts/${name}

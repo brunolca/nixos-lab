@@ -19,6 +19,12 @@ in
   options.homelab.services.mediaStack = {
     enable = mkEnableOption "Complete media stack";
 
+    enableSecrets = mkOption {
+      type = types.bool;
+      default = false;
+      description = "Enable declarative secrets management via sops-nix";
+    };
+
     baseDomain = mkOption {
       type = types.str;
       default = "localhost";
@@ -60,17 +66,20 @@ in
 
       arr = {
         enable = true;
+        enableSecrets = cfg.enableSecrets;
         mediaDir = cfg.mediaDir;
         downloadDir = cfg.downloadDir;
       };
 
       qbittorrent = {
         enable = true;
+        enableSecrets = cfg.enableSecrets;
         downloadDir = cfg.downloadDir;
       };
 
       bazarr = {
         enable = true;
+        enableSecrets = cfg.enableSecrets;
         mediaDir = cfg.mediaDir;
       };
 
