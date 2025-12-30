@@ -5,7 +5,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 IMAGE_DIR="$PROJECT_DIR/images"
 
-VM_NAME="${1:-minimal}"
+VM_NAME="${1:-vm-minimal}"
 MODE="${2:-gui}"  # gui, headless, or build
 
 # VM resources (adjust as needed)
@@ -14,23 +14,23 @@ CPUS="4"
 SSH_PORT="2222"
 
 # Use more memory for desktop
-if [[ "$VM_NAME" == "desktop" ]]; then
+if [[ "$VM_NAME" == "vm-desktop" ]]; then
   MEMORY="8G"
 fi
 
 show_help() {
   echo "Usage: run-vm <config> [mode]"
   echo ""
-  echo "Configs: minimal, server, desktop"
+  echo "Configs: vm-minimal, vm-server, vm-desktop"
   echo "Modes:"
   echo "  gui      - Run with graphical display (default)"
   echo "  headless - Run headless, SSH on port $SSH_PORT"
   echo "  build    - Build and run NixOS's built-in VM (recommended for testing)"
   echo ""
   echo "Examples:"
-  echo "  ./scripts/run-vm minimal"
-  echo "  ./scripts/run-vm server headless"
-  echo "  ./scripts/run-vm desktop build"
+  echo "  ./scripts/run-vm vm-minimal"
+  echo "  ./scripts/run-vm vm-server headless"
+  echo "  ./scripts/run-vm vm-desktop build"
 }
 
 if [[ "$VM_NAME" == "-h" || "$VM_NAME" == "--help" ]]; then
@@ -50,8 +50,8 @@ if [[ "$MODE" == "build" ]]; then
   echo "To quit: Ctrl+A, X (in serial console) or close window"
   echo ""
 
-  # Run the VM
-  "./result-${VM_NAME}-vm/bin/run-nixos-${VM_NAME}-vm"
+  # Run the VM - hostname is based on networking.hostName in config
+  "./result-${VM_NAME}-vm/bin/run-${VM_NAME}-vm"
   exit 0
 fi
 

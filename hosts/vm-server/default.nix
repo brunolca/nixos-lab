@@ -1,7 +1,7 @@
 { pkgs, ... }:
 
 {
-  networking.hostName = "nixos-server";
+  networking.hostName = "vm-server";
   system.stateVersion = "24.11";
 
   # Example services - uncomment to experiment
@@ -9,7 +9,7 @@
   # services.postgresql.enable = true;
   # virtualisation.docker.enable = true;
 
-  # Useful server packages
+  # Additional server packages
   environment.systemPackages = with pkgs; [
     tmux
     ripgrep

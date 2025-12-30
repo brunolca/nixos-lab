@@ -1,46 +1,27 @@
 {
-  description = "NixOS VM Lab - Learn and test NixOS configurations";
+  description = "NixOS GitOps Homelab";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
   };
 
-  outputs = { self, nixpkgs }:
+  outputs = { self, nixpkgs, ... }@inputs:
     let
-      # macOS system for devShell
+      # Import helper functions
+      lib = import ./lib { inherit nixpkgs self; };
+
+      # Darwin system for devShell
       darwinPkgs = nixpkgs.legacyPackages.aarch64-darwin;
-
-      # Helper to create a NixOS config for QEMU/aarch64
-      mkVM = name: nixpkgs.lib.nixosSystem {
-        system = "aarch64-linux";
-        modules = [
-          ./modules/common.nix
-          ./configs/${name}.nix
-          ({ modulesPath, ... }: {
-            imports = [ (modulesPath + "/profiles/qemu-guest.nix") ];
-
-            # Boot configuration for QEMU
-            boot.loader.grub.enable = true;
-            boot.loader.grub.device = "/dev/vda";
-            boot.initrd.availableKernelModules = [ "virtio_pci" "virtio_blk" "virtio_scsi" ];
-
-            # Root filesystem
-            fileSystems."/" = {
-              device = "/dev/vda1";
-              fsType = "ext4";
-            };
-
-            # QEMU guest agent for better integration
-            services.qemuGuest.enable = true;
-          })
-        ];
-      };
     in
     {
       nixosConfigurations = {
-        minimal = mkVM "minimal";
-        server = mkVM "server";
-        desktop = mkVM "desktop";
+        # VMs (aarch64-linux for local testing on Apple Silicon)
+        vm-minimal = lib.mkVM { name = "vm-minimal"; };
+        vm-server = lib.mkVM { name = "vm-server"; };
+        vm-desktop = lib.mkVM { name = "vm-desktop"; };
+
+        # Real hosts (uncomment when ready)
+        # roubaix = lib.mkHost { name = "roubaix"; system = "x86_64-linux"; };
       };
 
       devShells.aarch64-darwin.default = darwinPkgs.mkShell {
@@ -48,7 +29,7 @@
           qemu
         ];
         shellHook = ''
-          echo "NixOS VM Lab - run ./scripts/run-vm <config> build"
+          echo "NixOS Homelab - run ./scripts/run-vm <config> build"
         '';
       };
     };

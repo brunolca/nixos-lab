@@ -1,7 +1,7 @@
 { pkgs, ... }:
 
 {
-  networking.hostName = "nixos-desktop";
+  networking.hostName = "vm-desktop";
   system.stateVersion = "24.11";
 
   # Display server
@@ -22,6 +22,4 @@
     firefox
     kitty
   ];
-
-  # Increase memory for desktop (set in run-vm script)
 }
