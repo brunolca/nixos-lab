@@ -21,7 +21,7 @@ jobs:
           - prowlarr
           - qbittorrent
           - nginx
-          - media-stack
+          # media-stack excluded: depends on jellyfin which has upstream .NET issues
     steps:
       - name: Checkout
         uses: actions/checkout@v4
