@@ -18,4 +18,7 @@ in
 
   # Full integration test
   media-stack = import ./media-stack.nix { inherit pkgs lib; };
+
+  # Secrets integration test
+  secrets-integration = import ./secrets-integration.nix { inherit pkgs lib; };
 }
