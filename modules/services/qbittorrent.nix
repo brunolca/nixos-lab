@@ -56,6 +56,8 @@ in
       createHome = true;
     };
 
+    users.groups.${cfg.group} = {};
+
     systemd.services.qbittorrent = {
       description = "qBittorrent-nox service";
       after = [ "network.target" ];
