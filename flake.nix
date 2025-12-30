@@ -8,9 +8,14 @@
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    disko = {
+      url = "github:nix-community/disko";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, sops-nix, ... }@inputs:
+  outputs = { self, nixpkgs, sops-nix, disko, ... }@inputs:
     let
       # Import helper functions
       lib = import ./lib { inherit nixpkgs self inputs; };
@@ -25,8 +30,8 @@
         vm-server = lib.mkVM { name = "vm-server"; };
         vm-desktop = lib.mkVM { name = "vm-desktop"; };
 
-        # Real hosts (uncomment when ready)
-        # roubaix = lib.mkHost { name = "roubaix"; system = "x86_64-linux"; };
+        # Real hosts
+        roubaix = lib.mkHost { name = "roubaix"; system = "x86_64-linux"; };
       };
 
       devShells.aarch64-darwin.default = darwinPkgs.mkShell {
