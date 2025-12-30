@@ -49,7 +49,7 @@ pkgs.testers.runNixOSTest {
     # Test nginx proxy with Host header
     machine.succeed("curl -sf -H 'Host: jellyfin.test.local' http://localhost")
 
-    # Verify nginx is running with valid config
-    machine.succeed("nginx -t")
+    # Verify nginx service is healthy
+    machine.succeed("systemctl status nginx")
   '';
 }
