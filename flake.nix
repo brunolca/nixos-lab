@@ -49,5 +49,13 @@
           echo "NixOS Homelab - run ./scripts/run-vm <config> build"
         '';
       };
+
+      # NixOS VM tests (require linux builder on macOS)
+      checks.x86_64-linux = let
+        pkgs = nixpkgs.legacyPackages.x86_64-linux;
+        tests = import ./tests { inherit pkgs; };
+      in {
+        inherit (tests) jellyfin sonarr radarr prowlarr qbittorrent nginx media-stack;
+      };
     };
 }
