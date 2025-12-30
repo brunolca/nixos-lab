@@ -1,2 +1,5 @@
 images/
 result
+*.qcow2
+keys/
+result*
