@@ -36,6 +36,7 @@
   # Media stack configuration
   homelab.services.mediaStack = {
     enable = true;
+    enableSecrets = true;
     baseDomain = "brunofashionblog.fr";
     mediaDir = "/mnt/media";
     downloadDir = "/mnt/data/torrents";
