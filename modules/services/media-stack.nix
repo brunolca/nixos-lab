@@ -12,6 +12,7 @@ in
     ./jellyfin.nix
     ./arr-stack.nix
     ./qbittorrent.nix
+    ./bazarr.nix
     ./nginx-proxy.nix
   ];
 
@@ -66,6 +67,11 @@ in
       qbittorrent = {
         enable = true;
         downloadDir = cfg.downloadDir;
+      };
+
+      bazarr = {
+        enable = true;
+        mediaDir = cfg.mediaDir;
       };
 
       nginx = {
